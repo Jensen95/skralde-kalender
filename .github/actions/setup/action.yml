@@ -1,0 +1,10 @@
+name: Setup Node and Checkout
+description: Shared setup steps for Node.js and repository checkout
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+        cache: 'npm'

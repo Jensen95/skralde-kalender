@@ -1,0 +1,54 @@
+name: Deploy to Cloudflare Workers
+description: Shared deploy steps for Cloudflare deployment
+inputs:
+  CLOUDFLARE_API_TOKEN:
+    description: 'Cloudflare API Token'
+    required: true
+  CLOUDFLARE_ACCOUNT_ID:
+    description: 'Cloudflare Account ID'
+    required: true
+  ENV:
+    description: 'Deployment environment'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - uses: ./.github/actions/setup
+    - name: Install dependencies
+      shell: bash
+      run: npm ci
+    - name: Get time travel bookmark
+      id: time-travel
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+        command: d1 time-travel info DB --json ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
+    - name: Extract bookmark from JSON
+      id: extract-bookmark
+      shell: bash
+      run: |
+        echo "bookmark=$(echo '${{ steps.time-travel.outputs.command-output }}' | jq -r .bookmark)" >> $GITHUB_OUTPUT
+    - name: Print time travel bookmark
+      shell: bash
+      run: |
+        echo "Time travel bookmark: ${{ steps.extract-bookmark.outputs.bookmark }}"
+    - name: Database migration
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+        command: d1 migrations apply DB --remote ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
+    - name: Deploy to Cloudflare Workers
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+        command: deploy ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
+    - name: Rollback to previous state
+      if: failure()
+      uses: cloudflare/wrangler-action@v3
+      with:
+        apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
+        command: d1 time-travel rollback DB --timestamp ${{ steps.extract-bookmark.outputs.bookmark }} ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
