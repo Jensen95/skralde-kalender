@@ -1,29 +1,19 @@
-name = "ice-calendar-worker"
+name = "skralde-kalender-worker"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
 
 # D1 database for calendar events
 [[d1_databases]]
 binding = "DB"
-database_name = "ice-calendar-db"
-database_id = "your-d1-database-id"  # Replace with your actual D1 database ID
+database_name = "skralde-kalender"
+database_id = "2ed3b82e-234d-4feb-af1e-7ce9c28a564e"
 
 # Environment variables
 [vars]
-CALENDAR_NAME = "Ice Calendar"
-CALENDAR_DESCRIPTION = "Calendar populated from email forwards"
+CALENDAR_NAME = "Skralde kalender"
+CALENDAR_DESCRIPTION = "En kalender der er bliver udfyldt med hvornår affald bliver hentet"
 
 # Email routing configuration
 [[email]]
-name = "calendar-email"
-destination_address = "calendar@yourdomain.com"  # Replace with your email
-
-# Production environment configuration
-[env.production]
-name = "ice-calendar-worker-prod"
-vars = { CALENDAR_NAME = "Ice Calendar Production", CALENDAR_DESCRIPTION = "Production calendar service" }
-
-[env.production.d1_databases]
-binding = "DB"
-database_name = "ice-calendar-db-prod"
-database_id = "your-prod-d1-database-id"  # Replace with your production D1 database ID
+name = "skrald"
+destination_address = "skrald@jensen95.dk"
