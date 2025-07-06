@@ -4,7 +4,7 @@
   // Entry point
   "main": "src/index.ts",
   // Cloudflare compatibility date
-  "compatibility_date": "2024-01-01",
+  "compatibility_date": "2025-07-06",
 
   // D1 database for calendar events
   "d1_databases": [
@@ -20,14 +20,6 @@
     "CALENDAR_NAME": "Skralde kalender",
     "CALENDAR_DESCRIPTION": "En kalender der er bliver udfyldt med hvornår affald bliver hentet",
   },
-
-  // Email routing configuration
-  "email": [
-    {
-      "name": "skrald",
-      "destination_address": "skrald@jensen95.dk",
-    },
-  ],
 
   // Observability settings
   "observability": {
