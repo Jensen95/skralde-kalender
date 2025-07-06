@@ -1,129 +1,101 @@
-# Fixing Dependabot Auto-Approval Issues
+# Dependabot Auto-Merge Setup
 
-## The Problem
+## Overview
 
-Dependabot PRs aren't getting auto-approved because of a GitHub security restriction: workflows triggered by a pull request cannot approve that same pull request when using the default `GITHUB_TOKEN`. This prevents circular approvals where a PR could approve itself.
-
-This is documented in [GitHub's official documentation](https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions#responding-to-events).
-
-## Solutions
-
-### Option 1: Personal Access Token (PAT) - Recommended by GitHub
-
-This is the approach recommended in GitHub's official documentation. The workflow uses a Personal Access Token for approval and the default GITHUB_TOKEN for auto-merge.
-
-**File:** `.github/workflows/dependabot-auto-merge.yml` (already updated)
-
-**Setup Steps:**
-
-1. Create a Personal Access Token:
-   - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
-   - Click "Generate new token (classic)"
-   - Give it a descriptive name like "Dependabot Auto Approve"
-   - Select scopes:
-     - `repo` (full control of private repositories)
-     - `workflow` (if you want to approve workflow file updates)
-   - Generate and copy the token
-
-2. Add the PAT to your repository secrets:
-   - Go to your repository → Settings → Secrets and variables → Actions
-   - Click "New repository secret"
-   - Name: `DEPENDABOT_AUTO_APPROVE_PAT`
-   - Value: Paste your PAT
-   - Click "Add secret"
-
-3. The workflow is already updated to use this secret
-
-**Pros:**
-- Officially recommended by GitHub
-- Works reliably
-- Can be scoped to specific permissions
-- Follows GitHub's security best practices
-
-**Cons:**
-- Requires maintaining a PAT
-- PAT needs to be renewed periodically (set a reminder!)
-
-### Option 2: Using pull_request_target Event
-
-**File:** `.github/workflows/dependabot-auto-merge-alternative.yml` (created as alternative)
-
-To use this option:
-1. Delete `.github/workflows/dependabot-auto-merge.yml`
-2. Rename `.github/workflows/dependabot-auto-merge-alternative.yml` to `.github/workflows/dependabot-auto-merge.yml`
-
-**Pros:**
-- No PAT required
-- Uses built-in GITHUB_TOKEN
-
-**Cons:**
-- Security risk if not properly restricted (we've added `if: github.actor == 'dependabot[bot]'` to mitigate)
-- Runs in the context of the base branch, not the PR branch
-
-### Option 3: GitHub App Token
-
-Instead of a PAT, you can create a GitHub App for your organization and use it to generate tokens for approval.
-
-**Pros:**
-- More secure than PATs
-- Tokens are short-lived
-- Fine-grained permissions
-
-**Cons:**
-- More complex setup
-- Requires creating and managing a GitHub App
-
-See the example in `.github/workflows/dependabot-auto-merge-examples.yml` for implementation.
-
-### Option 4: Auto-merge without Approval
-
-If your branch protection rules don't require approvals, you can skip the approval step entirely and just enable auto-merge:
-
-```yaml
-- name: Enable auto-merge for Dependabot PRs
-  run: gh pr merge --auto --squash "$PR_URL"
-  env:
-    PR_URL: ${{github.event.pull_request.html_url}}
-    GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-```
-
-This works with the default GITHUB_TOKEN but provides less review oversight.
+This repository is configured to automatically merge Dependabot pull requests for minor and patch updates. Since your branch protection rules don't require approvals, we're using a simple workflow that just enables auto-merge.
 
 ## Current Configuration
 
-The workflow will automatically:
-- Approve minor and patch version updates
-- Enable auto-merge (squash) for approved PRs
-- Wait for all required status checks before merging
+The workflow (`.github/workflows/dependabot-auto-merge.yml`) will automatically:
+- Enable auto-merge for minor and patch version updates
+- Add labels to PRs based on update type (major/minor/patch)
+- Wait for all required status checks to pass before merging
+- Use squash merge strategy
 
-Major version updates will NOT be auto-approved (this is intentional for safety).
+Major version updates will NOT be auto-merged (this is intentional for safety).
 
-## Important Notes from GitHub Documentation
+## How It Works
 
-1. **GitHub CLI Environment Variable**: Use `GH_TOKEN` instead of `GITHUB_TOKEN` when using `gh` CLI commands
-2. **Metadata Action Version**: Use `dependabot/fetch-metadata@v2` (latest version)
-3. **Workflow Trigger**: The `pull_request` event is sufficient for most use cases
+1. Dependabot creates a pull request
+2. The workflow triggers and checks if it's a minor or patch update
+3. If yes, it enables auto-merge on the PR
+4. GitHub waits for all required status checks to pass
+5. Once checks pass, the PR is automatically merged
+
+## Setup Requirements
+
+1. **Enable auto-merge in repository settings**:
+   - Go to Settings → General → Pull Requests
+   - Check "Allow auto-merge"
+
+2. **Configure branch protection** (optional but recommended):
+   - Go to Settings → Branches
+   - Add rule for your main branch
+   - Enable "Require status checks to pass before merging"
+   - Select the checks you want to require
+
+3. **Dependabot configuration** (`.github/dependabot.yml`):
+   - Already configured in your repository
+   - Adjust update schedule and package ecosystems as needed
 
 ## Testing
 
 After setting up:
-1. Wait for the next Dependabot PR or manually trigger Dependabot
-2. Check the Actions tab to see if the workflow runs
-3. Verify the PR gets approved and auto-merge is enabled
+1. You can manually trigger Dependabot to check for updates
+2. Check the Actions tab to see if the workflow runs when Dependabot creates PRs
+3. Verify that minor/patch PRs have auto-merge enabled
+
+## Customization Options
+
+### Change which updates are auto-merged
+
+Edit the condition in the workflow:
+```yaml
+# Current: auto-merge minor and patch
+if: >
+  steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
+  steps.metadata.outputs.update-type == 'version-update:semver-patch'
+
+# Alternative: only patch updates
+if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+
+# Alternative: include major updates (use with caution!)
+if: steps.metadata.outputs.update-type != ''
+```
+
+### Change merge strategy
+
+Replace `--squash` with:
+- `--merge` for regular merge commits
+- `--rebase` for rebase merging
+
+### Add more conditions
+
+You can also filter by dependency type:
+```yaml
+if: >
+  steps.metadata.outputs.dependency-type == 'direct:development' &&
+  steps.metadata.outputs.update-type == 'version-update:semver-patch'
+```
 
 ## Troubleshooting
 
-If auto-approval still doesn't work:
+If auto-merge isn't working:
 
-1. **Check workflow runs**: Go to Actions tab and look for any errors in the "Dependabot Auto-Merge" workflow
-2. **Verify PAT permissions**: Ensure your PAT has `repo` scope
-3. **Check branch protection**: Auto-merge requires branch protection rules with required status checks
-4. **Enable auto-merge**: Repository settings → General → Pull Requests → Allow auto-merge
-5. **Verify secret name**: Make sure `DEPENDABOT_AUTO_APPROVE_PAT` matches exactly in both the workflow and repository secrets
+1. **Check workflow runs**: Go to Actions tab and look for errors
+2. **Verify auto-merge is enabled**: Repository settings → General → Pull Requests → Allow auto-merge
+3. **Check branch protection**: Ensure status checks are configured correctly
+4. **Review Dependabot logs**: Check if Dependabot is creating PRs successfully
 
 ## Security Notes
 
-- Never use `pull_request_target` without the `if: github.actor == 'dependabot[bot]'` condition
-- Regularly rotate PATs if using Option 1
-- Consider limiting auto-approval to only patch/minor updates (currently configured)
-- Review GitHub's documentation for latest best practices: https://docs.github.com/en/code-security/dependabot/working-with-dependabot/automating-dependabot-with-github-actions
+- Major version updates require manual review (good practice)
+- The workflow only runs for Dependabot PRs (checked via `github.actor == 'dependabot[bot]'`)
+- Uses only the default `GITHUB_TOKEN` with minimal permissions
+
+## Additional Examples
+
+See `.github/workflows/dependabot-auto-merge-examples.yml` for more advanced configurations including:
+- Auto-approval with PAT (if you later need approvals)
+- GitHub App integration
+- Advanced labeling and conditions
