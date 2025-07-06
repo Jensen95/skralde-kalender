@@ -1,6 +1,6 @@
 # This workflow automatically merges Dependabot PRs for minor and patch updates.
 # Major version updates require manual review for safety.
-# 
+#
 # Requirements:
 # 1. Enable "Allow auto-merge" in repository settings
 # 2. Configure branch protection rules with required status checks (optional)
