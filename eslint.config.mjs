@@ -172,7 +172,7 @@ export default tseslint.config(
       'unicorn/filename-case': ['error', { case: 'kebabCase' }],
       'unicorn/new-for-builtins': 'error',
       'unicorn/no-abusive-eslint-disable': 'error',
-      'unicorn/no-array-instanceof': 'error',
+      'unicorn/no-instanceof-builtins': 'error',
       'unicorn/no-console-spaces': 'error',
       'unicorn/no-for-loop': 'error',
       'unicorn/no-hex-escape': 'error',
@@ -181,7 +181,6 @@ export default tseslint.config(
       'unicorn/no-null': 'off', // Sometimes null is needed in Cloudflare Workers
       'unicorn/no-process-exit': 'off', // Sometimes needed
       'unicorn/no-unreadable-array-destructuring': 'error',
-      'unicorn/no-unsafe-regex': 'error',
       'unicorn/no-unused-properties': 'error',
       'unicorn/number-literal-case': 'error',
       'unicorn/prefer-array-find': 'error',
@@ -200,11 +199,11 @@ export default tseslint.config(
       'unicorn/prefer-regexp-test': 'error',
       'unicorn/prefer-set-has': 'error',
       'unicorn/prefer-spread': 'error',
-      'unicorn/prefer-starts-ends-with': 'error',
+      'unicorn/prefer-string-starts-ends-with': 'error',
       'unicorn/prefer-string-slice': 'error',
       'unicorn/prefer-ternary': 'error',
       'unicorn/prefer-top-level-await': 'off', // Not always appropriate
-      'unicorn/prefer-trim-start-end': 'error',
+      'unicorn/prefer-string-trim-start-end': 'error',
       'unicorn/prefer-type-error': 'error',
       'unicorn/prevent-abbreviations': 'off', // Allow common abbreviations
       'unicorn/throw-new-error': 'error',
