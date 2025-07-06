@@ -242,7 +242,6 @@ export class EmailEventParser implements EmailParser {
 export const parseEmailMessage = async (raw: ReadableStream<Uint8Array>): Promise<EmailMessage> => {
   // PostalMime can handle ReadableStream directly in Cloudflare Workers
   const parsed = await PostalMime.parse(raw)
-  console.log(parsed)
   // Convert headers to Map<string, string>
   const headers = new Map<string, string>()
   if (parsed.headers) {
