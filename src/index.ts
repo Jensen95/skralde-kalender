@@ -9,7 +9,7 @@ import { secureHeaders } from 'hono/secure-headers'
 import type { Env } from './types'
 
 import { generateCalendarResponse, generateICalendar } from './calendar'
-import { deleteEvent, getAllEvents, initializeDatabase, storeEvent } from './database'
+import { deleteEvent, getAllEvents, storeEvent } from './database'
 import { EmailEventParser, parseEmailMessage } from './email'
 
 const app = new Hono()
@@ -25,15 +25,6 @@ app.use(
 )
 app.use(secureHeaders())
 
-// Initialize database middleware
-app.use('*', async (c, next) => {
-  const env = c.env as unknown as Env
-  if (env?.DB) {
-    await initializeDatabase(env.DB)
-  }
-  await next()
-})
-
 // Create the chanfana router
 const openapi = fromHono(app, {
   docs_url: '/docs',
@@ -47,7 +38,7 @@ const openapi = fromHono(app, {
     servers: [
       {
         description: 'Production server',
-        url: 'https://your-worker.your-subdomain.workers.dev',
+        url: 'https://skralde-kalender-worker.jensen95.workers.dev',
       },
     ],
   },

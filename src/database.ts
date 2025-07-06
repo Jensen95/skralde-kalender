@@ -2,28 +2,6 @@
 
 import type { CalendarEvent } from './types'
 
-// Database schema
-export const SCHEMA = `
-CREATE TABLE IF NOT EXISTS calendar_events (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  description TEXT,
-  start_date TEXT NOT NULL,
-  end_date TEXT NOT NULL,
-  location TEXT,
-  organizer TEXT,
-  attendees TEXT, -- JSON array of email addresses
-  created_at TEXT NOT NULL,
-  modified_at TEXT NOT NULL,
-  event_type TEXT DEFAULT 'general', -- e.g., 'storskrald', 'glas_metal', 'general'
-  source_email TEXT -- Store original email for reference
-);
-
-CREATE INDEX IF NOT EXISTS idx_events_start_date ON calendar_events(start_date);
-CREATE INDEX IF NOT EXISTS idx_events_type ON calendar_events(event_type);
-CREATE INDEX IF NOT EXISTS idx_events_created ON calendar_events(created_at);
-`
-
 export const generateEventId = (): string => {
   return `event-${Date.now()}-${Math.random().toString(36).slice(2, 15)}`
 }
@@ -34,10 +12,6 @@ export const formatDateForStorage = (date: Date): string => {
 
 export const parseDateFromStorage = (dateString: string): Date => {
   return new Date(dateString)
-}
-
-export const initializeDatabase = async (db: D1Database): Promise<void> => {
-  await db.exec(SCHEMA)
 }
 
 export const storeEvent = async (db: D1Database, event: CalendarEvent): Promise<void> => {
