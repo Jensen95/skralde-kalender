@@ -3,6 +3,9 @@
 import { fromHono } from 'chanfana'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { csrf } from 'hono/csrf'
+import { requestId } from 'hono/request-id'
+import { secureHeaders } from 'hono/secure-headers'
 
 import type { Env } from './types'
 
@@ -13,7 +16,7 @@ import { EmailEventParser, parseEmailMessage } from './email'
 // Create new Hono app
 const app = new Hono()
 
-// Add CORS middleware
+app.use('*', requestId())
 app.use(
   '*',
   cors({
@@ -22,6 +25,8 @@ app.use(
     origin: '*',
   })
 )
+app.use(csrf())
+app.use(secureHeaders())
 
 // Initialize database middleware
 app.use('*', async (c, next) => {
