@@ -17,3 +17,7 @@ CALENDAR_DESCRIPTION = "En kalender der er bliver udfyldt med hvornår affald bl
 [[email]]
 name = "skrald"
 destination_address = "skrald@jensen95.dk"
+
+[observability]
+enabled = true
+head_sampling_rate = 1
