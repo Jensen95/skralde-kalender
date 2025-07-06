@@ -1,0 +1,37 @@
+{
+  // Worker name
+  "name": "skralde-kalender-worker",
+  // Entry point
+  "main": "src/index.ts",
+  // Cloudflare compatibility date
+  "compatibility_date": "2024-01-01",
+
+  // D1 database for calendar events
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "skralde-kalender",
+      "database_id": "2ed3b82e-234d-4feb-af1e-7ce9c28a564e",
+    },
+  ],
+
+  // Environment variables
+  "vars": {
+    "CALENDAR_NAME": "Skralde kalender",
+    "CALENDAR_DESCRIPTION": "En kalender der er bliver udfyldt med hvornår affald bliver hentet",
+  },
+
+  // Email routing configuration
+  "email": [
+    {
+      "name": "skrald",
+      "destination_address": "skrald@jensen95.dk",
+    },
+  ],
+
+  // Observability settings
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+}
