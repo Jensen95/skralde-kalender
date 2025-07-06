@@ -30,7 +30,7 @@
   "dependencies": {
     "chanfana": "^2.0.2",
     "hono": "^4.8.4",
-    "ical-generator": "^4.1.0",
+    "ical-generator": "^9.0.0",
     "postal-mime": "^2.2.4"
   },
   "devDependencies": {
