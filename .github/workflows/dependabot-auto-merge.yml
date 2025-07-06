@@ -1,3 +1,10 @@
+# This workflow automatically merges Dependabot PRs for minor and patch updates.
+# Major version updates require manual review for safety.
+# 
+# Requirements:
+# 1. Enable "Allow auto-merge" in repository settings
+# 2. Configure branch protection rules with required status checks (optional)
+
 name: Dependabot Auto-Merge
 
 on:
@@ -11,6 +18,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-latest
+    # Only run for Dependabot PRs
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: Dependabot metadata
@@ -19,6 +27,7 @@ jobs:
         with:
           github-token: '${{ secrets.GITHUB_TOKEN }}'
 
+      # Enable auto-merge for minor and patch updates only
       - name: Enable auto-merge for minor and patch updates
         if: >
           steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
@@ -28,7 +37,7 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Optional: Add labels for better PR organization
+      # Add labels for better PR organization
       - name: Label PR by update type
         run: |
           case "${{ steps.metadata.outputs.update-type }}" in
