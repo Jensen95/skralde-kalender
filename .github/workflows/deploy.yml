@@ -38,7 +38,8 @@ jobs:
           echo "bookmark=$(echo '${{ steps.time-travel.outputs.command-output }}' | jq -r .bookmark)" >> $GITHUB_OUTPUT
 
       - name: Print time travel bookmark
-        run: echo "Time travel bookmark: ${{ steps.extract-bookmark.outputs.bookmark }}"
+        run: |
+          echo "Time travel bookmark: ${{ steps.extract-bookmark.outputs.bookmark }}"
 
       - name: Database migration
         uses: cloudflare/wrangler-action@v3
