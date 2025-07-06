@@ -86,10 +86,10 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
-          'internal-pattern': ['@/**', '~/**'],
-          'newlines-between': 'always',
-          'max-line-length': undefined,
+          ignoreCase: true,
+          internalPattern: ['^@/.*', '^~/.*'],
+          newlinesBetween: 'always',
+          maxLineLength: undefined,
           groups: [
             'type',
             ['builtin', 'external'],
@@ -107,7 +107,7 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
+          ignoreCase: true,
         },
       ],
       'perfectionist/sort-named-exports': [
@@ -115,7 +115,7 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
+          ignoreCase: true,
         },
       ],
       'perfectionist/sort-exports': [
@@ -123,7 +123,7 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
+          ignoreCase: true,
         },
       ],
       'perfectionist/sort-object-types': [
@@ -131,7 +131,7 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
+          ignoreCase: true,
         },
       ],
       'perfectionist/sort-objects': [
@@ -139,8 +139,8 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
-          'partition-by-comment': true,
+          ignoreCase: true,
+          partitionByComment: true,
         },
       ],
       'perfectionist/sort-interfaces': [
@@ -148,7 +148,7 @@ export default tseslint.config(
         {
           type: 'alphabetical',
           order: 'asc',
-          'ignore-case': true,
+          ignoreCase: true,
         },
       ],
 
