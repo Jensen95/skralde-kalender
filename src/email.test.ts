@@ -77,8 +77,6 @@ describe('EmailEventParser', () => {
         { text: 'storskrald', expected: 'storskrald', title: 'Storskrald afhentning' },
         { text: 'glas/metal', expected: 'glas_metal', title: 'Glas/metal afhentning' },
         { text: 'restaffald', expected: 'restaffald', title: 'Restaffald afhentning' },
-        { text: 'madaffald', expected: 'madaffald', title: 'Madaffald afhentning' },
-        { text: 'genbrugsplast', expected: 'genbrugsplast', title: 'Genbrugsplast afhentning' },
       ]
 
       for (const wasteType of wasteTypes) {

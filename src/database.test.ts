@@ -85,7 +85,7 @@ describe('Database Operations', () => {
       expect(parsed.getFullYear()).toBe(2025)
       expect(parsed.getMonth()).toBe(6) // July (0-indexed)
       expect(parsed.getDate()).toBe(7)
-      expect(parsed.getHours()).toBe(7)
+      expect(parsed.getUTCHours()).toBe(7)
     })
 
     it('should handle round-trip date conversion', () => {

@@ -167,19 +167,17 @@ export class EmailEventParser implements EmailParser {
       haveaffald: 'haveaffald',
       madaffald: 'madaffald',
       miljoeboks: 'miljoeboks',
-      pap: 'pap',
       'plast og mad- & drikkekartoner/papir': 'plast_mad_drikke_papir',
+      // eslint-disable-next-line perfectionist/sort-objects
+      pap: 'pap',
       restaffald: 'restaffald',
       storskrald: 'storskrald',
     }
 
     for (const [pattern, type] of Object.entries(wasteTypes)) {
       if (pattern === 'plast og mad- & drikkekartoner/papir') {
-        // Require both 'plast' and ('mad- & drikkekartoner' or 'papir') in the text
-        if (
-          /plast/i.test(text) &&
-          (/mad-\s*&\s*drikkekartoner/i.test(text) || /papir/i.test(text))
-        ) {
+        // Match variations like 'plast og mad- & drikkekartoner/papir' with optional spaces
+        if (/plast\s*og\s*mad-\s*&\s*drikkekartoner\s*\/\s*papir/i.test(text)) {
           return type
         }
       } else if (text.toLowerCase().includes(pattern)) {
