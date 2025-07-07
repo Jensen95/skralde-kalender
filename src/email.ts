@@ -174,14 +174,17 @@ export class EmailEventParser implements EmailParser {
     }
 
     for (const [pattern, type] of Object.entries(wasteTypes)) {
-      if (text.toLowerCase().includes(pattern)) {
+      if (pattern === 'plast og mad- & drikkekartoner/papir') {
+        // Require both 'plast' and ('mad- & drikkekartoner' or 'papir') in the text
+        if (
+          /plast/i.test(text) &&
+          (/mad-\s*&\s*drikkekartoner/i.test(text) || /papir/i.test(text))
+        ) {
+          return type
+        }
+      } else if (text.toLowerCase().includes(pattern)) {
         return type
       }
-    }
-
-    // Also match partials for the combined type
-    if (/(plast|mad-\s*&\s*drikkekartoner)/i.test(text)) {
-      return 'plast_mad_drikke_papir'
     }
 
     return 'general'
