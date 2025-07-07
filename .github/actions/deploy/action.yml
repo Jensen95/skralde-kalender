@@ -3,7 +3,7 @@ description: Shared deploy steps for Cloudflare deployment
 runs:
   using: 'composite'
   steps:
-    - uses: ../setup
+    - uses: ./setup
     - name: Install dependencies
       run: npm ci
     - name: Get time travel bookmark
