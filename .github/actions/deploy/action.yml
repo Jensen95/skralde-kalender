@@ -10,7 +10,6 @@ inputs:
   ENV:
     description: 'Deployment environment'
     required: false
-    default: 'production'
 runs:
   using: 'composite'
   steps:
@@ -24,7 +23,7 @@ runs:
       with:
         apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-        command: d1 time-travel info DB --json --env ${{ inputs.ENV }}
+        command: d1 time-travel info DB --json ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
     - name: Extract bookmark from JSON
       id: extract-bookmark
       shell: bash
@@ -39,17 +38,17 @@ runs:
       with:
         apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-        command: d1 migrations apply DB --env ${{ inputs.ENV }}
+        command: d1 migrations apply DB ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
     - name: Deploy to Cloudflare Workers
       uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-        command: deploy --env ${{ inputs.ENV }}
+        command: deploy ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
     - name: Rollback to previous state
       if: failure()
       uses: cloudflare/wrangler-action@v3
       with:
         apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-        command: d1 time-travel rollback DB --timestamp ${{ steps.extract-bookmark.outputs.bookmark }} --env ${{ inputs.ENV }}
+        command: d1 time-travel rollback DB --timestamp ${{ steps.extract-bookmark.outputs.bookmark }} ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
