@@ -21,6 +21,8 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Cloudflare Workers (from CI)
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - uses: ./.github/actions/deploy
 
   deploy-manual:
@@ -29,4 +31,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Deploy to Cloudflare Workers (manual)
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
       - uses: ./.github/actions/deploy
