@@ -163,12 +163,12 @@ export class EmailEventParser implements EmailParser {
 
   private extractWasteCollectionType(text: string): string {
     const wasteTypes = {
-      genbrugsplast: 'genbrugsplast',
       'glas/metal': 'glas_metal',
+      haveaffald: 'haveaffald',
       madaffald: 'madaffald',
       miljoeboks: 'miljoeboks',
       pap: 'pap',
-      papir: 'papir',
+      'plast og mad- & drikkekartoner/papir': 'plast_mad_drikke_papir',
       restaffald: 'restaffald',
       storskrald: 'storskrald',
     }
@@ -179,18 +179,23 @@ export class EmailEventParser implements EmailParser {
       }
     }
 
+    // Also match partials for the combined type
+    if (/(plast|mad-\s*&\s*drikkekartoner)/i.test(text)) {
+      return 'plast_mad_drikke_papir'
+    }
+
     return 'general'
   }
 
   private createEventTitle(subject: string, eventType: string): string {
     const wasteTypeNames = {
-      genbrugsplast: 'Genbrugsplast afhentning',
       general: this.cleanEventTitle(subject),
       glas_metal: 'Glas/metal afhentning',
+      haveaffald: 'Haveaffald afhentning',
       madaffald: 'Madaffald afhentning',
       miljoeboks: 'Miljøboks afhentning',
       pap: 'Pap afhentning',
-      papir: 'Papir afhentning',
+      plast_mad_drikke_papir: 'Plast og Mad- & drikkekartoner/Papir afhentning',
       restaffald: 'Restaffald afhentning',
       storskrald: 'Storskrald afhentning',
     }
