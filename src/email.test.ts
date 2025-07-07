@@ -25,7 +25,7 @@ describe('EmailEventParser', () => {
     it('should parse storskrald collection email', async () => {
       const email = createMockEmail(
         'Affaldsafhentning',
-        'Kære Morten Hartvig Jensen.\n\nDu vil mandag d.07-07-2025 få afhentet storskrald på adressen Nøddeskellet 8, 2730 Herlev.'
+        'Du vil mandag d.07-07-2025 få afhentet storskrald på adressen Testvej 1, 1234 København.'
       )
 
       const events = await parser.extractEvents(email)
@@ -36,14 +36,14 @@ describe('EmailEventParser', () => {
       expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
       expect(events[0].start.getDate()).toBe(7)
       expect(events[0].start.getHours()).toBe(7) // 07:00
-      expect(events[0].location).toBe('Nøddeskellet 8, 2730 Herlev')
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
       expect((events[0] as any).eventType).toBe('storskrald')
     })
 
     it('should parse glas/metal collection email', async () => {
       const email = createMockEmail(
         'Glas/metal afhentning',
-        'Du vil mandag d.15-08-2025 få tømt glas/metal på adressen Nøddeskellet 8, 2730 Herlev.'
+        'Du vil mandag d.15-08-2025 få tømt glas/metal på adressen Testvej 1, 1234 København.'
       )
 
       const events = await parser.extractEvents(email)
@@ -53,7 +53,7 @@ describe('EmailEventParser', () => {
       expect(events[0].start.getFullYear()).toBe(2025)
       expect(events[0].start.getMonth()).toBe(7) // August (0-indexed)
       expect(events[0].start.getDate()).toBe(15)
-      expect(events[0].location).toBe('Nøddeskellet 8, 2730 Herlev')
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
       expect((events[0] as any).eventType).toBe('glas_metal')
     })
 
@@ -76,10 +76,7 @@ describe('EmailEventParser', () => {
       const wasteTypes = [
         { text: 'storskrald', expected: 'storskrald', title: 'Storskrald afhentning' },
         { text: 'glas/metal', expected: 'glas_metal', title: 'Glas/metal afhentning' },
-        { text: 'papir', expected: 'papir', title: 'Papir afhentning' },
         { text: 'restaffald', expected: 'restaffald', title: 'Restaffald afhentning' },
-        { text: 'madaffald', expected: 'madaffald', title: 'Madaffald afhentning' },
-        { text: 'genbrugsplast', expected: 'genbrugsplast', title: 'Genbrugsplast afhentning' },
       ]
 
       for (const wasteType of wasteTypes) {
@@ -94,6 +91,74 @@ describe('EmailEventParser', () => {
         expect(events[0].title).toBe(wasteType.title)
         expect((events[0] as any).eventType).toBe(wasteType.expected)
       }
+    })
+
+    it('should parse pap (cardboard) collection email', async () => {
+      const email = createMockEmail(
+        'Pap afhentning',
+        'Du vil mandag d.10-07-2025 få afhentet pap på adressen Testvej 1, 1234 København.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Pap afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(10)
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
+      expect((events[0] as any).eventType).toBe('pap')
+    })
+
+    it('should parse miljoeboks (environmental box) collection email', async () => {
+      const email = createMockEmail(
+        'Miljøboks afhentning',
+        'Du vil mandag d.17-07-2025 få afhentet miljoeboks på adressen Testvej 1, 1234 København.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Miljøboks afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(17)
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
+      expect((events[0] as any).eventType).toBe('miljoeboks')
+    })
+
+    it('should parse plast og mad- & drikkekartoner/papir (plastic and food & drink cartons/paper) collection email', async () => {
+      const email = createMockEmail(
+        'Plast og Mad- & drikkekartoner/Papir afhentning',
+        'Du vil mandag d.24-07-2025 få afhentet plast og mad- & drikkekartoner/papir på adressen Testvej 1, 1234 København.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Plast og Mad- & drikkekartoner/Papir afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(24)
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
+      expect((events[0] as any).eventType).toBe('plast_mad_drikke_papir')
+    })
+
+    it('should parse haveaffald (garden waste) collection email', async () => {
+      const email = createMockEmail(
+        'Haveaffald afhentning',
+        'Du vil mandag d.31-07-2025 få afhentet haveaffald på adressen Testvej 1, 1234 København.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Haveaffald afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(31)
+      expect(events[0].location).toBe('Testvej 1, 1234 København')
+      expect((events[0] as any).eventType).toBe('haveaffald')
     })
   })
 

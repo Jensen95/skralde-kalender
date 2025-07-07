@@ -27,25 +27,25 @@ describe('Calendar Generation', () => {
       id: 'event-1',
       title: 'Storskrald afhentning',
       description: 'Waste collection event',
-      start: new Date('2025-07-07T07:00:00'),
-      end: new Date('2025-07-07T08:00:00'),
+      start: new Date('2025-07-07T07:00:00Z'),
+      end: new Date('2025-07-07T08:00:00Z'),
       location: 'Nøddeskellet 8, 2730 Herlev',
       organizer: 'waste@municipality.dk',
       attendees: ['user@example.com'],
-      created: new Date('2025-01-01T00:00:00'),
-      modified: new Date('2025-01-01T00:00:00'),
+      created: new Date('2025-01-01T00:00:00Z'),
+      modified: new Date('2025-01-01T00:00:00Z'),
     },
     {
       id: 'event-2',
       title: 'Team Meeting',
       description: 'Weekly team sync',
-      start: new Date('2025-07-08T09:00:00'),
-      end: new Date('2025-07-08T10:00:00'),
+      start: new Date('2025-07-08T09:00:00Z'),
+      end: new Date('2025-07-08T10:00:00Z'),
       location: 'Conference Room A',
       organizer: 'manager@company.com',
       attendees: ['team@company.com'],
-      created: new Date('2025-01-01T00:00:00'),
-      modified: new Date('2025-01-01T00:00:00'),
+      created: new Date('2025-01-01T00:00:00Z'),
+      modified: new Date('2025-01-01T00:00:00Z'),
     },
   ]
 
@@ -141,10 +141,10 @@ describe('Calendar Generation', () => {
       const minimalEvent: CalendarEvent = {
         id: 'minimal-event',
         title: 'Minimal Event',
-        start: new Date('2025-07-07T07:00:00'),
-        end: new Date('2025-07-07T08:00:00'),
-        created: new Date('2025-01-01T00:00:00'),
-        modified: new Date('2025-01-01T00:00:00'),
+        start: new Date('2025-07-07T07:00:00Z'),
+        end: new Date('2025-07-07T08:00:00Z'),
+        created: new Date('2025-01-01T00:00:00Z'),
+        modified: new Date('2025-01-01T00:00:00Z'),
         // No description, location, organizer, attendees
       }
 

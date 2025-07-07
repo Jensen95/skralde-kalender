@@ -163,16 +163,24 @@ export class EmailEventParser implements EmailParser {
 
   private extractWasteCollectionType(text: string): string {
     const wasteTypes = {
-      genbrugsplast: 'genbrugsplast',
       'glas/metal': 'glas_metal',
+      haveaffald: 'haveaffald',
       madaffald: 'madaffald',
-      papir: 'papir',
+      miljoeboks: 'miljoeboks',
+      'plast og mad- & drikkekartoner/papir': 'plast_mad_drikke_papir',
+      // eslint-disable-next-line perfectionist/sort-objects
+      pap: 'pap',
       restaffald: 'restaffald',
       storskrald: 'storskrald',
     }
 
     for (const [pattern, type] of Object.entries(wasteTypes)) {
-      if (text.toLowerCase().includes(pattern)) {
+      if (pattern === 'plast og mad- & drikkekartoner/papir') {
+        // Match variations like 'plast og mad- & drikkekartoner/papir' with optional spaces
+        if (/plast\s*og\s*mad-\s*&\s*drikkekartoner\s*\/\s*papir/i.test(text)) {
+          return type
+        }
+      } else if (text.toLowerCase().includes(pattern)) {
         return type
       }
     }
@@ -182,11 +190,13 @@ export class EmailEventParser implements EmailParser {
 
   private createEventTitle(subject: string, eventType: string): string {
     const wasteTypeNames = {
-      genbrugsplast: 'Genbrugsplast afhentning',
       general: this.cleanEventTitle(subject),
       glas_metal: 'Glas/metal afhentning',
+      haveaffald: 'Haveaffald afhentning',
       madaffald: 'Madaffald afhentning',
-      papir: 'Papir afhentning',
+      miljoeboks: 'Miljøboks afhentning',
+      pap: 'Pap afhentning',
+      plast_mad_drikke_papir: 'Plast og Mad- & drikkekartoner/Papir afhentning',
       restaffald: 'Restaffald afhentning',
       storskrald: 'Storskrald afhentning',
     }
