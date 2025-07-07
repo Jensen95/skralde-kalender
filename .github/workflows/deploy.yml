@@ -12,63 +12,21 @@ permissions:
 
 jobs:
   run-ci:
+    name: Run CI
     if: ${{ github.event_name == 'workflow_dispatch' }}
     uses: ./.github/workflows/ci.yml
 
-  deploy:
-    needs: [run-ci]
-    if: ${{ (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') || github.event_name == 'workflow_dispatch' }}
+  deploy-from-ci:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
     runs-on: ubuntu-latest
-    name: Deploy to Cloudflare Workers
-
+    name: Deploy to Cloudflare Workers (from CI)
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: ./.github/actions/deploy
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Get time travel bookmark
-        id: time-travel
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: d1 time-travel info DB --json --env production
-
-      - name: Extract bookmark from JSON
-        id: extract-bookmark
-        run: |
-          echo "bookmark=$(echo '${{ steps.time-travel.outputs.command-output }}' | jq -r .bookmark)" >> $GITHUB_OUTPUT
-
-      - name: Print time travel bookmark
-        run: |
-          echo "Time travel bookmark: ${{ steps.extract-bookmark.outputs.bookmark }}"
-
-      - name: Database migration
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: d1 migrations apply DB --env production
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --env production
-
-      - name: Rollback to previous state
-        if: failure()
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: d1 time-travel rollback DB --timestamp ${{ steps.extract-bookmark.outputs.bookmark }} --env production
+  deploy-manual:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs: [run-ci]
+    runs-on: ubuntu-latest
+    name: Deploy to Cloudflare Workers (manual)
+    steps:
+      - uses: ./.github/actions/deploy
