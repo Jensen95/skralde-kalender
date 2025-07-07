@@ -38,7 +38,7 @@ runs:
       with:
         apiToken: ${{ inputs.CLOUDFLARE_API_TOKEN }}
         accountId: ${{ inputs.CLOUDFLARE_ACCOUNT_ID }}
-        command: d1 migrations apply DB ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
+        command: d1 migrations apply DB --remote ${{ inputs.ENV && format('--env {0}', inputs.ENV) || '' }}
     - name: Deploy to Cloudflare Workers
       uses: cloudflare/wrangler-action@v3
       with:
