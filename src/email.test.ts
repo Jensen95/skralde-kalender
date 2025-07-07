@@ -95,6 +95,23 @@ describe('EmailEventParser', () => {
         expect((events[0] as any).eventType).toBe(wasteType.expected)
       }
     })
+
+    it('should parse pap (cardboard) collection email', async () => {
+      const email = createMockEmail(
+        'Pap afhentning',
+        'Du vil mandag d.10-07-2025 få afhentet pap på adressen Nøddeskellet 8, 2730 Herlev.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Pap afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(10)
+      expect(events[0].location).toBe('Nøddeskellet 8, 2730 Herlev')
+      expect((events[0] as any).eventType).toBe('pap')
+    })
   })
 
   describe('Address parsing', () => {
