@@ -14,7 +14,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: ./setup
+    - uses: ./.github/actions/setup
     - name: Install dependencies
       shell: bash
       run: npm ci
