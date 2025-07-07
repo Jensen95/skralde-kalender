@@ -112,6 +112,23 @@ describe('EmailEventParser', () => {
       expect(events[0].location).toBe('Nøddeskellet 8, 2730 Herlev')
       expect((events[0] as any).eventType).toBe('pap')
     })
+
+    it('should parse miljoeboks (environmental box) collection email', async () => {
+      const email = createMockEmail(
+        'Miljøboks afhentning',
+        'Du vil mandag d.17-07-2025 få afhentet miljoeboks på adressen Nøddeskellet 8, 2730 Herlev.'
+      )
+
+      const events = await parser.extractEvents(email)
+
+      expect(events).toHaveLength(1)
+      expect(events[0].title).toBe('Miljøboks afhentning')
+      expect(events[0].start.getFullYear()).toBe(2025)
+      expect(events[0].start.getMonth()).toBe(6) // July (0-indexed)
+      expect(events[0].start.getDate()).toBe(17)
+      expect(events[0].location).toBe('Nøddeskellet 8, 2730 Herlev')
+      expect((events[0] as any).eventType).toBe('miljoeboks')
+    })
   })
 
   describe('Address parsing', () => {
