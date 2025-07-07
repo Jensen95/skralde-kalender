@@ -5,37 +5,40 @@ runs:
   steps:
     - uses: ./setup
     - name: Install dependencies
+      shell: bash
       run: npm ci
     - name: Get time travel bookmark
       id: time-travel
       uses: cloudflare/wrangler-action@v3
       with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         command: d1 time-travel info DB --json --env production
     - name: Extract bookmark from JSON
       id: extract-bookmark
+      shell: bash
       run: |
         echo "bookmark=$(echo '${{ steps.time-travel.outputs.command-output }}' | jq -r .bookmark)" >> $GITHUB_OUTPUT
     - name: Print time travel bookmark
+      shell: bash
       run: |
         echo "Time travel bookmark: ${{ steps.extract-bookmark.outputs.bookmark }}"
     - name: Database migration
       uses: cloudflare/wrangler-action@v3
       with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         command: d1 migrations apply DB --env production
     - name: Deploy to Cloudflare Workers
       uses: cloudflare/wrangler-action@v3
       with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         command: deploy --env production
     - name: Rollback to previous state
       if: failure()
       uses: cloudflare/wrangler-action@v3
       with:
-        apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        apiToken: ${{ env.CLOUDFLARE_API_TOKEN }}
+        accountId: ${{ env.CLOUDFLARE_ACCOUNT_ID }}
         command: d1 time-travel rollback DB --timestamp ${{ steps.extract-bookmark.outputs.bookmark }} --env production
